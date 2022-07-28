@@ -10,7 +10,29 @@ a {
   color: inherit;
   text-decoration: none;
 }
+.resizable {
+  width: 120px;
+  border-radius: 0.75rem;
+  padding: 20px;
+  margin: 1rem;
+  background-color: #29e;
+  color: white;
+  font-size: 20px;
+  font-family: sans-serif;
+  overflow: hidden;
 
+  touch-action: none;
+
+  /* This makes things *much* easier */
+  box-sizing: border-box;
+}
+#svgWrapperFinal {
+  height: 100%;
+  width: 100%;
+}
+.draggable {
+  cursor: pointer;
+}
 * {
   box-sizing: border-box;
 }
