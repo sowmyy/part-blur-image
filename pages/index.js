@@ -8,11 +8,13 @@ import domtoimage from 'dom-to-image';
 export default function Home() {
 	const [ imageFile, setImageFile ] = useState(null);
 	const [ isPayblockActive, setIsPayblockActive ] = useState(false);
+	const [ sliderValueWidth, setSliderValueWidth ] = useState(10);
+	const [ sliderValueHeight, setSliderValueHeight ] = useState(10);
 
 	useEffect(() => {
 		if (imageFile) {
 			// Draggable Functionality
-			const position = { x: 0, y: 0 }
+			const position = { x: 0, y: 0 };
 			const blurArea = document.querySelector("#area")
 			interact('.item').draggable({
 			listeners: {
@@ -29,26 +31,6 @@ export default function Home() {
 							},
 					}
 			})
-			// Re-sizable Functionality
-			interact('.item').resizable({
-		    edges: { top: true, left: true, bottom: true, right: true },
-		    listeners: {
-		      move: function (event) {
-		        let { x, y } = event.target.dataset
-
-		        x = (parseFloat(x) || 0) + event.deltaRect.left
-		        y = (parseFloat(y) || 0) + event.deltaRect.top
-
-		        Object.assign(event.target.style, {
-		          width: `${event.rect.width}px`,
-		          height: `${event.rect.height}px`,
-		          transform: `translate(${x}px, ${y}px)`
-		        })
-
-		        Object.assign(event.target.dataset, { x, y })
-		      }
-		    }
-		  })
 		}
 	}, [imageFile]);
 
@@ -62,8 +44,17 @@ export default function Home() {
 		}
 	}
 
+	const increaseWidth = (event) => {
+		setSliderValueWidth(event.target.value);
+	}
+
+	const increaseHeight = (event) => {
+		setSliderValueHeight(event.target.value);
+	}
+
 	const generateSnapshot = () => {
-		const node = document.getElementById('svgWrapperFinal');
+		// const node = document.getElementById('svgWrapperFinal');
+
 		domtoimage.toJpeg(document.getElementById('svgWrapperFinal'), { quality: 0.95 })
 		    .then(function (dataUrl) {
 		        var link = document.createElement('a');
@@ -105,7 +96,7 @@ export default function Home() {
 			              Everything outside the circle will be
 			              clipped and therefore invisible.
 			            --> */}
-			            <rect id = "area" x="0" y="0" height="300" width = "300" />
+			            <rect id = "area" x="0" y="20" height={sliderValueHeight + 20 } width={sliderValueWidth + 20} />
 			          </clipPath>
 
 			        <g id="squares">
@@ -120,7 +111,16 @@ export default function Home() {
 			          {/* <!-- <use class = "item" clipPath="url(#myClip)" href="#squares" filter = "url(#blurry)" /> --> */}
 			      </svg>
 				</div>
-
+				{imageFile && <>
+					<div className="slidecontainer">
+						<label>Height</label>
+						<input onInput={increaseHeight} type="range" min="1" max="100" value={sliderValueHeight} className="slider" id="myRange" />
+					</div>
+					<div className="slidecontainer">
+						<label>Width</label>
+						<input onInput={increaseWidth} type="range" min="1" max="100" value={sliderValueWidth} className="slider" id="myRange" />
+					</div>
+				</>}
 
 				{/* {isPayblockActive && <img className={styles.imageStyled} id="img" src={imageFile} alt="your image" />} */}
 				{/* {!isPayblockActive &&
