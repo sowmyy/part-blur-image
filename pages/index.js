@@ -10,12 +10,13 @@ export default function Home() {
 	const [ isPayblockActive, setIsPayblockActive ] = useState(false);
 	const [ sliderValueWidth, setSliderValueWidth ] = useState(10);
 	const [ sliderValueHeight, setSliderValueHeight ] = useState(10);
+	const myArea = useRef(null);
+	const svgWrapperFinal = useRef(null);
 
 	useEffect(() => {
 		if (imageFile) {
 			// Draggable Functionality
 			const position = { x: 0, y: 0 };
-			const blurArea = document.querySelector("#area")
 			interact('.item').draggable({
 			listeners: {
 					start (event) {
@@ -24,8 +25,8 @@ export default function Home() {
 							move (event) {
 							position.x += event.dx
 							position.y += event.dy
-							blurArea.setAttribute("x", position.x)
-							blurArea.setAttribute("y", position.y)
+							myArea.current.setAttribute("x", position.x)
+							myArea.current.setAttribute("y", position.y)
 							event.target.style.transform =
 									`translate(${position.x}px, ${position.y}px)`
 							},
@@ -54,8 +55,7 @@ export default function Home() {
 
 	const generateSnapshot = () => {
 		// const node = document.getElementById('svgWrapperFinal');
-
-		domtoimage.toJpeg(document.getElementById('svgWrapperFinal'), { quality: 0.95 })
+		domtoimage.toJpeg(svgWrapperFinal.current, { quality: 0.95 })
 		    .then(function (dataUrl) {
 		        var link = document.createElement('a');
 		        link.download = 'my-image-name.jpeg';
@@ -83,7 +83,7 @@ export default function Home() {
 				</h2>
 				<p>Upload an image</p>
 				<input type="file" onChange={readURL} />
-				<div id="svgWrapperFinal">
+				<div ref={svgWrapperFinal} id="svgWrapperFinal">
 					<svg x="0px" y="0px" width="500px" height="500px" viewbox="0 0 500 500">
 			        <defs>
 			          <filter id="blurry" x="0%" y="0%" height="100%" width="100%" primitiveUnits="userSpaceOnUse">
@@ -96,7 +96,7 @@ export default function Home() {
 			              Everything outside the circle will be
 			              clipped and therefore invisible.
 			            --> */}
-			            <rect id = "area" x="0" y="20" height={sliderValueHeight + 20 } width={sliderValueWidth + 20} />
+			            <rect ref={myArea} id = "area" x="0" y="20" height={sliderValueHeight + 20 } width={sliderValueWidth + 20} />
 			          </clipPath>
 
 			        <g id="squares">
