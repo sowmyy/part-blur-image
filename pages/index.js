@@ -111,26 +111,26 @@ export default function Home() {
 
 	const generateSnapshot = () => {
 		// const mySvg = document.querySelector('#svgWrapperFinal');
-		// const node = document.getElementById('svgWrapperFinal');
+		const node = document.getElementById('svgWrapperFinal');
 
 
-		// downloadPng(node, 'my_svg', {downloadPNGOptions:{ scale: 2 }});
-		// const options = {
-		// 	width: 800,
-		// 	height: 450,
-		// 	scale: 1,
-		// }
+		downloadPng(node, 'my_svg', {downloadPNGOptions:{ scale: 2 }});
+		const options = {
+			width: 800,
+			height: 450,
+			scale: 1,
+		}
 		// mySvg.svgAsPngUri(svgWrapperFinal.current, options).then(uri =>
 		// 	console.log('test URL', uri)
 		// );
 		// svg.saveSvgAsPng(document.getElementById("svgWrapperFinal"), "masked_image.png");
-		domtoimage.toJpeg(svgWrapperFinal.current, { quality: 1.5 })
-		    .then(function (dataUrl) {
-		        var link = document.createElement('a');
-		        link.download = 'my-image-name.jpeg';
-		        link.href = dataUrl;
-		        link.click();
-		    });
+		// domtoimage.toJpeg(svgWrapperFinal.current, { quality: 1.5 })
+		//     .then(function (dataUrl) {
+		//         var link = document.createElement('a');
+		//         link.download = 'my-image-name.jpeg';
+		//         link.href = dataUrl;
+		//         link.click();
+		//     });
 	}
 
 	return (
