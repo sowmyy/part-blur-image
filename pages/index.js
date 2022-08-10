@@ -4,9 +4,11 @@ import styles from '../styles/Home.module.css';
 import interact from 'interactjs'
 import React, { useEffect, useState, useCallback, useRef } from 'react';
 import domtoimage from 'dom-to-image';
+import * as mySvg from 'save-svg-as-png';
+import downloadPng from 'svg-crowbar';
 
 export default function Home() {
-	const [ imageFile, setImageFile ] = useState(null);
+	const [ imageFile, setImageFile ] = useState('https://tartl-canvas.s3.ap-south-1.amazonaws.com/canvas/688aae6f-c199-4875-a0e0-e31f6f69bc0f');
 	const [ isPayblockActive, setIsPayblockActive ] = useState(false);
 	const [ sliderValueWidth, setSliderValueWidth ] = useState(10);
 	const [ sliderValueHeight, setSliderValueHeight ] = useState(10);
@@ -15,6 +17,7 @@ export default function Home() {
 
 	useEffect(() => {
 		if (imageFile) {
+			getBase64FromUrl();
 			// Draggable Functionality
 			const position = { x: 0, y: 0 };
 			interact('.item').draggable({
@@ -32,14 +35,67 @@ export default function Home() {
 							},
 					}
 			})
+			// http.get(imageFile, {responseType: "arraybuffer"}).success((data) => {
+			// 		console.log('data', data)
+			//     // fd.append('file', data);
+			// });
+			// fetch(imageFile)
+			//   .then(res => res.blob()) // Gets the response and returns it as a blob
+			//   .then(blob => {
+			//     // Here's where you get access to the blob
+			//     // And you can use it for whatever you want
+			//     // Like calling ref().put(blob)
+			//
+			//     // Here, I use it to make an image appear on the page
+			//     let objectURL = URL.createObjectURL(blob);
+			//     let myImage = new Image();
+			//     myImage.src = objectURL;
+			//     document.getElementById('myImg').appendChild(myImage)
+			// });
+			// let svgString = new XMLSerializer().serializeToString(document.getElementById('svgWrapperFinal'));
+			// let canvas = document.getElementById("canvas");
+			// let ctx = canvas.getContext("2d");
+			// let DOMURL = self.URL || self.webkitURL || self;
+			// let img = new Image();
+			// let svg = new Blob([svgString], {type: "image/svg+xml;charset=utf-8"});
+			// let url = DOMURL.createObjectURL(svg);
+			// img.onload = function() {
+			//     ctx.drawImage(img, 0, 0);
+			//     let png = canvas.toDataURL("image/png");
+			//     document.querySelector('#png-container').innerHTML = '<img src="'+png+'"/>';
+			//     DOMURL.revokeObjectURL(png);
+			// };
+			// img.src = url;
+			// var canvas = document.getElementById("canvas"),
+			// ctx = canvas.getContext("2d"),
+			// image = document.getElementById("svgWrapperFinal");
+			// ctx.drawImage(image, 0, 0, canvas.width, canvas.height);
+
 		}
 	}, [imageFile]);
+
+	const getBase64FromUrl = async () => {
+			const data = await fetch(imageFile);
+			const blob = await data.blob();
+			return new Promise((resolve) => {
+			  const reader = new FileReader();
+			  reader.readAsDataURL(blob);
+			  reader.onloadend = () => {
+				const base64data = reader.result;
+				console.log(base64data)
+				setImageFile(base64data);
+				resolve(base64data);
+			  }
+			});
+	}
+
 
 	const readURL = () => {
 		if (event.target.files && event.target.files[0]) {
 			const reader = new FileReader();
 			reader.onload = function(e) {
-				setImageFile(e.target.result);
+				// setImageFile(e.target.result);
+				getBase64FromUrl('https://tartl-canvas.s3.ap-south-1.amazonaws.com/canvas/688aae6f-c199-4875-a0e0-e31f6f69bc0f');
 			};
 			reader.readAsDataURL(event.target.files[0]);
 		}
@@ -54,8 +110,21 @@ export default function Home() {
 	}
 
 	const generateSnapshot = () => {
+		// const mySvg = document.querySelector('#svgWrapperFinal');
 		// const node = document.getElementById('svgWrapperFinal');
-		domtoimage.toJpeg(svgWrapperFinal.current, { quality: 0.95 })
+
+
+		// downloadPng(node, 'my_svg', {downloadPNGOptions:{ scale: 2 }});
+		// const options = {
+		// 	width: 800,
+		// 	height: 450,
+		// 	scale: 1,
+		// }
+		// mySvg.svgAsPngUri(svgWrapperFinal.current, options).then(uri =>
+		// 	console.log('test URL', uri)
+		// );
+		// svg.saveSvgAsPng(document.getElementById("svgWrapperFinal"), "masked_image.png");
+		domtoimage.toJpeg(svgWrapperFinal.current, { quality: 1.5 })
 		    .then(function (dataUrl) {
 		        var link = document.createElement('a');
 		        link.download = 'my-image-name.jpeg';
@@ -81,10 +150,11 @@ export default function Home() {
 				<h2>
 					To blur a part of an image
 				</h2>
-				<p>Upload an image</p>
-				<input type="file" onChange={readURL} />
-				<div ref={svgWrapperFinal} id="svgWrapperFinal">
-					<svg x="0px" y="0px" width="500px" height="500px" viewbox="0 0 500 500">
+				{/* <p>Upload an image</p>
+				<input type="file" onChange={readURL} /> */}
+				<div ref={svgWrapperFinal} >
+					{/* <canvas id="canvas" width="500" height="500"></canvas> */}
+					<svg id="svgWrapperFinal" x="0px" y="0px" width="500px" height="500px" viewbox="0 0 500 500">
 			        <defs>
 			          <filter id="blurry" x="0%" y="0%" height="100%" width="100%" primitiveUnits="userSpaceOnUse">
 			            <feGaussianBlur x="0" y="0" width="400" height="400" stdDeviation="10" in="SourceGraphic" result="blurSquares"/>
@@ -111,7 +181,8 @@ export default function Home() {
 			          {/* <!-- <use class = "item" clipPath="url(#myClip)" href="#squares" filter = "url(#blurry)" /> --> */}
 			      </svg>
 				</div>
-				{imageFile && <>
+				<div id="myImg"></div>
+				<>
 					<div className="slidecontainer">
 						<label>Height</label>
 						<input onInput={increaseHeight} type="range" min="1" max="100" value={sliderValueHeight} className="slider" id="myRange" />
@@ -120,7 +191,7 @@ export default function Home() {
 						<label>Width</label>
 						<input onInput={increaseWidth} type="range" min="1" max="100" value={sliderValueWidth} className="slider" id="myRange" />
 					</div>
-				</>}
+				</>
 
 				{/* {isPayblockActive && <img className={styles.imageStyled} id="img" src={imageFile} alt="your image" />} */}
 				{/* {!isPayblockActive &&
